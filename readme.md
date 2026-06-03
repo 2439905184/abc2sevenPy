@@ -4,5 +4,7 @@
 ## 开发
 ```
 pip install music21
+pip install abc
+pip install pyabc2
 pip install pillow
 ```
