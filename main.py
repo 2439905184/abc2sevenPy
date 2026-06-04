@@ -107,7 +107,7 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
     # 可选：显示标题
     title = score.metadata.title or "Untitled"
     draw.text((20, 20), f"🎵 {title}", fill='#2c6280')
-
+    img.show()
     # 保存图片
     img.save(outputPath)
     print(f"✅ 七线谱已保存到: {outputPath}")
