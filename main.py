@@ -33,6 +33,7 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
     # 获取所有音符和休止符（按时间顺序）
     all_notes = []
     max_time = 0
+    
     for part in score.parts:
         for element in part.flat.notesAndRests:
             if element.isNote:
@@ -76,7 +77,7 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
     draw = ImageDraw.Draw(img)
 
     # 1. 画七条线，左侧标注音名
-    for i, name in enumerate(['C','D','E','F','G','A','B']):
+    for i, name in enumerate(['1','2','3','4','5','6','7']):
         y = staff_base_y - i * line_spacing
         draw.line((40, y, canvas_width-40, y), fill='black', width=1)
         draw.text((12, y-6), name, fill='black')
