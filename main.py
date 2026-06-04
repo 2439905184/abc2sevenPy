@@ -1,3 +1,18 @@
+"""
+在 Pillow (PIL) 中，图像的坐标系统遵循计算机图形学常见的约定：
+
+原点 (0, 0) 位于图像的左上角。
+
+X 轴 水平向右增加（x 从 0 到 width-1）。
+
+Y 轴 垂直向下增加（y 从 0 到 height-1）。
+
+因此，当你使用 ImageDraw 绘制点时，(0,0) 是左上角像素，(width-1, height-1) 是右下角像素。
+
+例如，画一条从 (0,0) 到 (100, 100) 的线段，它会在图像上从左上角向右下角倾斜 45°。
+
+在绘制乐谱时，你需要根据这个坐标系调整 y 值：越靠下的线，y 值越大。之前代码中 staff_base_y（最低线 C 的 Y 坐标）较大，正是为了让低音出现在下方。
+"""
 import argparse
 import music21
 from PIL import Image, ImageDraw, ImageFont
@@ -116,13 +131,14 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
 
     # 可选：显示标题
     title = score.metadata.title or "Untitled"
-    draw.text((20, 20), f"🎵 {title}", fill='#2c6280')
+    draw.text((20, 20), f" {title}", fill='#2c6280',font=ChineseFont)
     img.show()
     # 保存图片
     img.save(outputPath)
     print(f"✅ 七线谱已保存到: {outputPath}")
 
 if __name__ == "__main__":
+    ChineseFont = ImageFont.truetype("assets/puhuiti.otf", size=20)
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=str, required=True)
     parser.add_argument("--output", type=str, required=True)
