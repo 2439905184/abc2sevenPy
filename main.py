@@ -14,7 +14,16 @@ def getMetaData(score: music21.stream.Score):
         "title": score.metadata.title,
         "composer": score.metadata.composer,
     }
-
+def 获取全局调号(score: music21.stream.Score) -> str:
+    ks = score.flat.getElementsByClass(music21.key.KeySignature)
+    if ks:
+        key = ks[0].asKey()
+    主音音名 = key.tonic.name
+    调性 = key.mode
+    if 调性 == "major":
+        return f"1={主音音名}"
+    else:
+        return f"6={主音音名}"
 def drawStaff(score: music21.stream.Score, outputPath: str):
     """
     根据 music21 解析出的乐谱，绘制七线谱（自然音阶谱）。
@@ -33,7 +42,7 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
     # 获取所有音符和休止符（按时间顺序）
     all_notes = []
     max_time = 0
-    
+    调号 = 获取全局调号(score)
     for part in score.parts:
         for element in part.flat.notesAndRests:
             if element.isNote:
@@ -75,7 +84,7 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
     canvas_height = 360
     img = Image.new('RGB', (canvas_width, canvas_height), 'white')
     draw = ImageDraw.Draw(img)
-
+    draw.text((12,staff_base_y - 8 * line_spacing), 调号, fill="black")
     # 1. 画七条线，左侧标注音名
     for i, name in enumerate(['1','2','3','4','5','6','7']):
         y = staff_base_y - i * line_spacing
@@ -92,11 +101,11 @@ def drawStaff(score: music21.stream.Score, outputPath: str):
     # 3. 画所有音符和休止符
     for item in all_notes:
         if item['type'] == 'rest':
-            # 休止符：画一个矩形 + 文字 '𝄽'
+            # 休止符：画一个矩形 + 文字 'pause'
             x = item['x']
             y = item['y']
             draw.rectangle([x-6, y-5, x+6, y+3], fill='#5f7f9e')
-            draw.text((x-4, y-2), '𝄽', fill='white')
+            draw.text((x-4, y-2), 'pause', fill='white')
         else:
             # 音符符头
             x = item['x']
