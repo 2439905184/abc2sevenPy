@@ -1,11 +1,7 @@
 X:2
-T:Für Elise (Excerpt)
+T:献给爱丽丝
 C:Ludwig van Beethoven
-M:3/8
+M:3/4
 L:1/16
-%%score [RH|LH]
-V:RH clef=treble
-V:LH clef=bass
-K:Am
-[V:RH] (E3 D E) | (E3 D E) | (E B, c) d e | (d c B A) B, c |
-[V:LH] A,,2 A,,2 A,,2 | A,,2 A,,2 A,,2 | E,,2 E,,2 E,,2 | E,,2 E,,2 E,,2 ||
+K:C
+e2 d2 e2 d2 e2 B2 d2 c2 |A4 z C2 E2 A2 |B4
