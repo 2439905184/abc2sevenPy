@@ -1,0 +1,909 @@
+{
+  "name": "abc-ls",
+  "displayName": "abc-ls",
+  "description": "",
+  "version": "0.1.0",
+  "publisher": "antoinebalaine",
+  "repository": "https://github.com/AntoineBalaine/abcls",
+  "engines": {
+    "vscode": "^1.84.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "license": "GPL-3.0-or-later",
+  "icon": "assets/trebleclef_abc.png",
+  "activationEvents": [
+    "onLanguage:abc"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "abc.startMIDIInput",
+        "title": "abc: MIDI Input: Start MIDI input",
+        "group": "MIDI Input",
+        "description": "Start MIDI Input. You can also use the `Start MIDI Input` button on the right of the status bar. MIDI input device is set using `abc: MIDI Playback: Set input device` command.`"
+      },
+      {
+        "command": "abc.stopMIDIInput",
+        "title": "abc: MIDI Input: Stop MIDI input",
+        "group": "MIDI Input",
+        "description": "Stop MIDI Input. You can also use the `Stop MIDI Input` button on the right of the status bar."
+      },
+      {
+        "command": "abc.setInputMIDIDevice",
+        "title": "abc: MIDI Input: Set input device",
+        "group": "MIDI Input",
+        "description": "Set workspace-folder specific MIDI input device for input. You can also change this manually (for more scopes) in settings under `abc › Midi Input: Input`."
+      },
+      {
+        "command": "abc.restartMIDIInput",
+        "title": "abc: MIDI Input: Restart MIDI Input",
+        "group": "MIDI Input",
+        "description": "Restart MIDI Input. Try this if the input stops working after changing your MIDI Input device/port."
+      },
+      {
+        "command": "abc.showPreview",
+        "title": "ABC: Show Preview",
+        "group": "Renderer"
+      },
+      {
+        "command": "abc.showPreviewLight",
+        "title": "ABC: Show Preview (Light)",
+        "group": "Renderer"
+      },
+      {
+        "command": "abc.exportHtml",
+        "title": "ABC: Export as HTML",
+        "group": "Renderer"
+      },
+      {
+        "command": "abc.exportSvg",
+        "title": "ABC: Export as SVG",
+        "group": "Renderer"
+      },
+      {
+        "command": "abc.printPreview",
+        "title": "ABC: Print Preview",
+        "group": "Renderer"
+      },
+      {
+        "command": "abc.playDocument",
+        "title": "ABC: Play Document",
+        "group": "Playback",
+        "description": "Play the current ABC document using MuseSampler"
+      },
+      {
+        "command": "abc.playSelection",
+        "title": "ABC: Play Selection",
+        "group": "Playback",
+        "description": "Play the selected ABC text using MuseSampler"
+      },
+      {
+        "command": "abc.stopPlayback",
+        "title": "ABC: Stop Playback",
+        "group": "Playback",
+        "description": "Stop the current playback"
+      },
+      {
+        "command": "abc.pausePlayback",
+        "title": "ABC: Pause Playback",
+        "group": "Playback",
+        "description": "Pause the current playback"
+      },
+      {
+        "command": "abc.resumePlayback",
+        "title": "ABC: Resume Playback",
+        "group": "Playback",
+        "description": "Resume paused playback"
+      },
+      {
+        "command": "abc.showInstruments",
+        "title": "ABC: Show Available Instruments",
+        "group": "Playback",
+        "description": "Show list of available MuseSampler instruments"
+      },
+      {
+        "command": "abc.initPlayback",
+        "title": "ABC: Initialize Playback",
+        "group": "Playback",
+        "description": "Initialize the MuseSampler playback engine"
+      },
+      {
+        "command": "abc.resetSelection",
+        "title": "ABC: Reset Selection",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectChords",
+        "title": "ABC: Select Chords",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectNotes",
+        "title": "ABC: Select Notes",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectNonChordNotes",
+        "title": "ABC: Select Non-Chord Notes",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectChordNotes",
+        "title": "ABC: Select Chord Notes",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectRests",
+        "title": "ABC: Select Rests",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectTune",
+        "title": "ABC: Select Tune",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectTop",
+        "title": "ABC: Select Top Note",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectBottom",
+        "title": "ABC: Select Bottom Note",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectNthFromTop",
+        "title": "ABC: Select Nth From Top",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectAllButTop",
+        "title": "ABC: Select All But Top",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectAllButBottom",
+        "title": "ABC: Select All But Bottom",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectRhythm",
+        "title": "ABC: Select Rhythm Expressions",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectRhythmParent",
+        "title": "ABC: Select Elements with Rhythm",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectMeasures",
+        "title": "ABC: Select Measures",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectSystem",
+        "title": "ABC: Select System",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.selectVoices",
+        "title": "ABC: Select Voices",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.wrapCrescendo",
+        "title": "ABC: Wrap Selection in Crescendo",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.wrapDecrescendo",
+        "title": "ABC: Wrap Selection in Decrescendo",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.transpose",
+        "title": "ABC: Transpose Selection",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.enharmonize",
+        "title": "ABC: Enharmonize Selection",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.enharmonizeToKey",
+        "title": "ABC: Enharmonize to Key",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.setRhythm",
+        "title": "ABC: Set Rhythm",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.addToRhythm",
+        "title": "ABC: Add to Rhythm",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.toRest",
+        "title": "ABC: Convert to Rest",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.unwrapSingle",
+        "title": "ABC: Unwrap Single-Note Chord",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.remove",
+        "title": "ABC: Remove Selection",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.addVoice",
+        "title": "ABC: Add Voice",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.insertVoiceLine",
+        "title": "ABC: Insert Voice Line",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.transposeOctaveUp",
+        "title": "ABC: Transpose Octave Up",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.transposeOctaveDown",
+        "title": "ABC: Transpose Octave Down",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.transposeHalfStepUp",
+        "title": "ABC: Transpose Half Step Up",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.transposeHalfStepDown",
+        "title": "ABC: Transpose Half Step Down",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize3rdUp",
+        "title": "ABC: Harmonize 3rd Up",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize3rdDown",
+        "title": "ABC: Harmonize 3rd Down",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize4thUp",
+        "title": "ABC: Harmonize 4th Up",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize4thDown",
+        "title": "ABC: Harmonize 4th Down",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize5thUp",
+        "title": "ABC: Harmonize 5th Up",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize5thDown",
+        "title": "ABC: Harmonize 5th Down",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize6thUp",
+        "title": "ABC: Harmonize 6th Up",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonize6thDown",
+        "title": "ABC: Harmonize 6th Down",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.consolidateSelections",
+        "title": "ABC: Consolidate Selections",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.consolidateRests",
+        "title": "ABC: Consolidate Rests",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.voiceInfoLineToInline",
+        "title": "ABC: Convert Voice Info Line to Inline",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.voiceInlineToInfoLine",
+        "title": "ABC: Convert Voice Inline to Info Line",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.explode",
+        "title": "ABC: Explode Chords to Parts",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.explode2",
+        "title": "ABC: Explode to 2 Parts",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.explode3",
+        "title": "ABC: Explode to 3 Parts",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.explode4",
+        "title": "ABC: Explode to 4 Parts",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.explosion",
+        "title": "ABC: Timed Explosion (Explode to Named Voices)",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.multiplyRhythm",
+        "title": "ABC: Double Rhythm Length",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.divideRhythm",
+        "title": "ABC: Halve Rhythm Length",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.addSharp",
+        "title": "ABC: Add Sharp",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.addFlat",
+        "title": "ABC: Add Flat",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.legato",
+        "title": "ABC: Legato",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.toSlashNotation",
+        "title": "ABC: Convert to Slash Notation",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonizeVoicing",
+        "title": "ABC: Harmonize with Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonizeClose",
+        "title": "ABC: Harmonize Close Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonizeDrop2",
+        "title": "ABC: Harmonize Drop2 Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonizeDrop24",
+        "title": "ABC: Harmonize Drop24 Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonizeDrop3",
+        "title": "ABC: Harmonize Drop3 Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.harmonizeCluster",
+        "title": "ABC: Harmonize Cluster Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.parallelVoicing",
+        "title": "ABC: Parallel Voicing",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.parallelDiatonicPrev",
+        "title": "ABC: Parallel Diatonic (Previous Chord)",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.parallelDiatonicNext",
+        "title": "ABC: Parallel Diatonic (Next Chord)",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.parallelChromaticPrev",
+        "title": "ABC: Parallel Chromatic (Previous Chord)",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.parallelChromaticNext",
+        "title": "ABC: Parallel Chromatic (Next Chord)",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.splitSystem",
+        "title": "ABC: Split System at Cursor",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.exportToMidi",
+        "title": "ABC: Export to MIDI",
+        "category": "ABC"
+      },
+      {
+        "command": "abc.importFromMidi",
+        "title": "ABC: Import from MIDI",
+        "category": "ABC"
+      }
+    ],
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "abc.resetSelection",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectChords",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectNotes",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectNonChordNotes",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectChordNotes",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectRests",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectTune",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectTop",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectBottom",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectNthFromTop",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectAllButTop",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectAllButBottom",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectRhythm",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectRhythmParent",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectMeasures",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectSystem",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.selectVoices",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.wrapCrescendo",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.wrapDecrescendo",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.transpose",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.enharmonize",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.enharmonizeToKey",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.setRhythm",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.addToRhythm",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.toRest",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.unwrapSingle",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.remove",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.addVoice",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.insertVoiceLine",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.transposeOctaveUp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.transposeOctaveDown",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.transposeHalfStepUp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.transposeHalfStepDown",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize3rdUp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize3rdDown",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize4thUp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize4thDown",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize5thUp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize5thDown",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize6thUp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonize6thDown",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.consolidateSelections",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.consolidateRests",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.voiceInfoLineToInline",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.voiceInlineToInfoLine",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.explode",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.explode2",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.explode3",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.explode4",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.explosion",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.multiplyRhythm",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.divideRhythm",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.addSharp",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.addFlat",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.legato",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.toSlashNotation",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonizeVoicing",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonizeClose",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonizeDrop2",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonizeDrop24",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonizeDrop3",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.harmonizeCluster",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.parallelVoicing",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.parallelDiatonicPrev",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.parallelDiatonicNext",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.parallelChromaticPrev",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.parallelChromaticNext",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.splitSystem",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.exportToMidi",
+          "when": "editorLangId == abc"
+        },
+        {
+          "command": "abc.importFromMidi"
+        }
+      ]
+    },
+    "configurationDefaults": {
+      "[abc]": {
+        "editor.semanticHighlighting.enabled": true
+      }
+    },
+    "configuration": {
+      "title": "abc",
+      "properties": {
+        "abc.midiInput.input": {
+          "type": "string",
+          "default": "",
+          "group": "MIDI Input",
+          "description": "MIDI Device used for input. If none specified, the first valid device is used. After changing, please run the `abc: MIDI Input: Restart MIDI Input` command. You can alternatively use the command `abc: MIDI Input: Set output device` to select a device from a list.",
+          "scope": "resource"
+        },
+        "abc.midiInput.chordMode": {
+          "type": "boolean",
+          "default": false,
+          "group": "MIDI Input",
+          "description": "Chord mode in music entry. Registers notes that are pressed and held together as a chord instead of sequential notes.",
+          "scope": "resource"
+        },
+        "abc.renderer.responsive": {
+          "type": "string",
+          "default": "resize",
+          "enum": [
+            "",
+            "resize"
+          ],
+          "group": "Renderer",
+          "description": "Responsive rendering mode. 'resize' adapts to container width.",
+          "scope": "resource"
+        },
+        "abc.renderer.print": {
+          "type": "boolean",
+          "default": false,
+          "group": "Renderer",
+          "description": "Enable print formatting mode.",
+          "scope": "resource"
+        },
+        "abc.renderer.oneSvgPerLine": {
+          "type": "boolean",
+          "default": false,
+          "group": "Renderer",
+          "description": "Render each stave system as a separate SVG.",
+          "scope": "resource"
+        },
+        "abc.renderer.jazzchords": {
+          "type": "boolean",
+          "default": false,
+          "group": "Renderer",
+          "description": "Use jazz-style chord symbol formatting.",
+          "scope": "resource"
+        },
+        "abc.renderer.showDebug": {
+          "type": "boolean",
+          "default": false,
+          "group": "Renderer",
+          "description": "Show debug grid and boxes.",
+          "scope": "resource"
+        },
+        "abc.renderer.tablature": {
+          "type": "string",
+          "default": "",
+          "enum": [
+            "",
+            "Violin",
+            "Guitar"
+          ],
+          "group": "Renderer",
+          "description": "Show tablature for the specified instrument.",
+          "scope": "resource"
+        },
+        "abc.renderer.visualTranspose": {
+          "type": "integer",
+          "default": 0,
+          "minimum": -12,
+          "maximum": 12,
+          "group": "Renderer",
+          "description": "Transpose the rendered score by semitones.",
+          "scope": "resource"
+        },
+        "abc.renderer.showTransposedSource": {
+          "type": "boolean",
+          "default": false,
+          "group": "Renderer",
+          "description": "Show transposed ABC source code.",
+          "scope": "resource"
+        },
+        "abc.experimental.playback": {
+          "type": "boolean",
+          "default": false,
+          "group": "Experimental",
+          "description": "Enable experimental MuseSampler playback. Requires building the native binary from source. See MUSESAMPLER_SETUP.md.",
+          "scope": "window"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "abc",
+        "aliases": [
+          "abc",
+          "ABC"
+        ],
+        "extensions": [
+          ".abc",
+          ".abcx"
+        ],
+        "capabilities": {
+          "documentFormattingProvider": "true"
+        },
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "abc",
+        "scopeName": "source.abc",
+        "path": "./abcjs-renderer/abc.tmGrammar.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package-bundle",
+    "build": "tsc -p ./ && node esbuild.js",
+    "build:production": "tsc -p ./ && node esbuild.js --production",
+    "compile": "tsc -p ./",
+    "watch": "npm run watch-bundle",
+    "watch-bundle": "node esbuild.js --watch",
+    "package-bundle": "node esbuild.js --production",
+    "copy-binary": "node -e \"const fs=require('fs');const path=require('path');const os=require('os');const binDir='bin';const srcDir=path.join('..','native','build');const binaryName=os.platform()==='win32'?'mscore.exe':'mscore';fs.mkdirSync(binDir,{recursive:true});const src=path.join(srcDir,binaryName);const dest=path.join(binDir,binaryName);if(fs.existsSync(src)){fs.copyFileSync(src,dest);fs.chmodSync(dest,0o755);console.log('Copied',binaryName,'to',binDir);}else{console.warn('Warning:',src,'not found. Build native package first.');}\"",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "lint:fix": "eslint src --ext ts --fix",
+    "_test": "node ../out/vscode-extension/test/runTest.js",
+    "package": "vsce package --out ..",
+    "publish": "vsce publish"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.3",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.84.0",
+    "@typescript-eslint/eslint-plugin": "^6.9.0",
+    "@typescript-eslint/parser": "^6.9.0",
+    "@vscode/test-electron": "^2.3.6",
+    "@vscode/vsce": "^3.7.1",
+    "esbuild": "^0.25.10",
+    "eslint": "^8.52.0",
+    "glob": "^10.3.10",
+    "mocha": "^10.2.0",
+    "typescript": "^5.2.2"
+  },
+  "dependencies": {
+    "abcls-parser": "*",
+    "abcls-native": "*",
+    "jzz": "^1.7.4",
+    "jzz-midi-smf": "^1.8.1",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.11"
+  }
+}

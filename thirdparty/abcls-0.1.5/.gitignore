@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+error.log
+out
+pnpm-lock.yaml
+*.vsix
+
+# Native build
+native/build/
+
+# Extension binary
+vscode-extension/bin/
+
+# VS Code test runner cache
+vscode-extension/.vscode-test/
