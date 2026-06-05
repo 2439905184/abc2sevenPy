@@ -154,8 +154,10 @@ def draw_staff(
     # 画小节线（每个谱表独立）
     for m in measures:
         x = start_x + m.offset * PIXELS_PER_BEAT
-        #if start_x - 10 < x < canvas_width - 30:
-        draw.line((x, line_y[0] - 6*LINE_SPACING, x, line_y[6] + 6*LINE_SPACING), fill="black", width=10)
+        top_y = line_y[6] - 5
+        bottom_y = line_y[0] + 5
+        draw.line((x, top_y, x, bottom_y), fill="black", width=1)
+        print("小节线:", m.offset, x)
 
     # 处理音符/休止符
     for el in notes_and_rests:
@@ -190,8 +192,6 @@ def draw_staff(
                     fill="black",
                     width=1,
                 )
-                
-
             # -------- 符头 --------
             # draw.ellipse(
             #     [
@@ -249,7 +249,7 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
 
     # 获取小节
     measures = list(score.flat.getElementsByClass(music21.stream.Measure))
-
+    print(measures)
     # 计算最大时间
     all_notes = treble_notes + bass_notes
     max_time = max((el.offset + el.quarterLength for el in all_notes), default=4)
