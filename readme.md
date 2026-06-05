@@ -33,6 +33,7 @@ pip install pillow
 
 ## 使用与找谱子
 1. 找abc谱子或者下musescore的谱子，转换成musicXML后可以被该程序读取就可以导出7线谱图片了
+使用museScore转成musicxml的时候注意，可以在文件乐谱属性里面设置workTitle,不然导出的7线谱图片没有标题
 
 ## ABC谱语法参考
 [ABC谱语法参考](ABCquickRefv0_6.pdf)
