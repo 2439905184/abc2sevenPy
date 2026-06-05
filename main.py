@@ -39,8 +39,8 @@ BASS = StaffConfig(48, "低音")
 
 # --------------------------------- 全局布局 ---------------------------------
 LINE_SPACING = 12
-NOTE_HEAD_R = 6
-PIXELS_PER_BEAT = 38
+NOTE_HEAD_R =  6 #6 #符头半径
+PIXELS_PER_BEAT = 80 # 38 normal
 
 # 谱表垂直间距
 STAFF_TOP_Y = 200  # 高音谱第一条线 Y
@@ -114,7 +114,11 @@ def draw_staff(
     """
     base_midi = config.base_midi
     # 七条线的 Y 坐标 (线1=最下)
-    line_y = [staff_y - i * LINE_SPACING for i in range(7)]
+    # line_y = [staff_y - i * LINE_SPACING for i in range(7)]
+    line_y = []
+    for i in range(7):
+        y = staff_y - i * LINE_SPACING
+        line_y.append(y)
 
     # 画七条线
     for i, y in enumerate(line_y):
@@ -150,8 +154,8 @@ def draw_staff(
     # 画小节线（每个谱表独立）
     for m in measures:
         x = start_x + m.offset * PIXELS_PER_BEAT
-        if start_x - 10 < x < canvas_width - 30:
-            draw.line((x, line_y[0] - 6, x, line_y[6] + 6), fill="gray", width=1)
+        #if start_x - 10 < x < canvas_width - 30:
+        draw.line((x, line_y[0] - 6*LINE_SPACING, x, line_y[6] + 6*LINE_SPACING), fill="black", width=10)
 
     # 处理音符/休止符
     for el in notes_and_rests:
@@ -167,7 +171,7 @@ def draw_staff(
                 y = line3_y + LINE_SPACING
             else:
                 y = line3_y
-            draw.rectangle([x - 6, y - 6, x + 6, y + 4], fill="#5f7f9e")
+            #draw.rectangle([x - 6, y - 6, x + 6, y + 4], fill="#5f7f9e")
             draw.text((x - 4, y - 2), symbol, fill="black", font=font)
             continue
 
@@ -189,15 +193,17 @@ def draw_staff(
                 
 
             # -------- 符头 --------
-            draw.ellipse(
-                [
-                    x - NOTE_HEAD_R,
-                    note_y - NOTE_HEAD_R,
-                    x + NOTE_HEAD_R,
-                    note_y + NOTE_HEAD_R,
-                ],
-                fill="black",
-            )
+            # draw.ellipse(
+            #     [
+            #         x - NOTE_HEAD_R,
+            #         note_y - NOTE_HEAD_R,
+            #         x + NOTE_HEAD_R,
+            #         note_y + NOTE_HEAD_R,
+            #     ],
+            #     fill="black",
+            # )
+            draw.circle([x,note_y], NOTE_HEAD_R, fill="black")
+            draw.text((x-NOTE_HEAD_R,note_y),str(el.pitch),fill="black",font=font)
 
             # -------- 临时变音记号 --------
             acc = el.pitch.accidental
