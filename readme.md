@@ -34,5 +34,8 @@ pip install pillow
 ## 使用与找谱子
 1. 找abc谱子或者下musescore的谱子，转换成musicXML后可以被该程序读取就可以导出7线谱图片了
 
+## ABC谱语法参考
+[ABC谱语法参考](ABCquickRefv0_6.pdf)
+
 ## 设计哲学
 [七线谱定义和介绍v4版](%E4%B8%83%E7%BA%BF%E8%B0%B1%E5%AE%9A%E4%B9%89%E5%92%8C%E4%BB%8B%E7%BB%8Dv4%E7%89%88.txt)
