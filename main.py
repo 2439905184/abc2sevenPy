@@ -178,12 +178,17 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
     draw = ImageDraw.Draw(img)
 
     try:
-        font = ImageFont.truetype("assets/puhuiti.otf", 16)
+        chineseFont = ImageFont.truetype("assets/puhuiti.otf", 16)
+        #chineseFont = ImageFont.truetype("", 36)
         music_font = ImageFont.truetype("assets/bravura.ttf", 20)
     except:
-        font = ImageFont.load_default()
-        music_font = font
-
+        #chineseFont = ImageFont.load_default()
+        #music_font = chineseFont
+        pass
+    # 标题
+    title = score.metadata.title or "Untitled"
+    draw.text((0, 0), title, font=chineseFont,fill='black', )
+    print(chineseFont)
     # 构建调性时间线（只用于显示标签）
     key_events = get_time_sorted_events(score, music21.key.KeySignature)
     key_timeline = []
@@ -198,16 +203,14 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
 
     # 绘制高音谱
     draw_staff(draw, TREBLE, STAFF_TOP_Y, treble_notes, key_timeline,
-               80, canvas_width, font, music_font, measures, None)
+    80, canvas_width, chineseFont, music_font, measures, None)
 
-    # 绘制低音谱（如果有）
+    #绘制低音谱（如果有）
     if bass_part:
         draw_staff(draw, BASS, BASS_TOP_Y, bass_notes, key_timeline,
-                   80, canvas_width, font, music_font, measures, None)
+                   80, canvas_width, chineseFont, music_font, measures, None)
 
-    # 标题
-    title = score.metadata.title or "Untitled"
-    draw.text((20, 20), title, fill='#2c6280', font=font)
+    
 
     img.save(output_path)
     img.show()
