@@ -12,17 +12,17 @@ def get_time_sorted_events(stream, event_class):
 
 def get_rest_shape(duration):
     if duration >= 3.9:
-        return ("full", "𝄻")
+        return ("full", "休")
     elif duration >= 1.9:
-        return ("half", "𝄼")
+        return ("half", "休")
     elif duration >= 0.9:
-        return ("quarter", "𝄽")
+        return ("quarter", "休")
     elif duration >= 0.45:
-        return ("eighth", "𝄾")
+        return ("eighth", "休")
     elif duration >= 0.225:
-        return ("16th", "𝄿")
+        return ("16th", "休")
     else:
-        return ("other", "𝄿")
+        return ("other", "休")
 
 
 # --------------------------------- 谱表配置 ---------------------------------
@@ -47,9 +47,54 @@ STAFF_TOP_Y = 200  # 高音谱第一条线 Y
 STAFF_GAP = 80  # 两谱表第一条线之间的距离（高音第一条线到低音第一条线）
 BASS_TOP_Y = STAFF_TOP_Y + STAFF_GAP
 
+
+# 返回: line_offset (整数)。0 表示基准线，1 表示高一条线，-1 表示低一条线。
+# 你的思路非常清晰且正确：先算半音差，再根据自然音阶的“全全半全全全半”规律，将其转换为线位索引。
+def get_line_offset_from_midi_treble(midi_note, base_midi_c) -> int:
+    # 计算 MIDI 音符相对于基准 C (base_midi_c) 的线索引偏移量。
+    """计算半音差：diff_semitones = midi_note - base_midi。
+定义自然音阶步长：
+C -> D: +2 半音 (全音)
+D -> E: +2 半音 (全音)
+E -> F: +1 半音 (半音)
+F -> G: +2 半音 (全音)
+G -> A: +2 半音 (全音)
+A -> B: +2 半音 (全音)
+B -> C: +1 半音 (半音)
+循环累加：从基准线（Line 0）开始，不断减去上述步长，直到剩余的半音数不足以支撑下一个自然音级。减去的次数就是线位的偏移量。
+"""
+    半音差 = midi_note - base_midi_c
+    自然音阶半音关系表 = [2, 2, 1, 2, 2, 2, 1] # 这里表示midi数字编号的差，1就是半音，2就是全音
+    line_offset = 0
+    remaining_semitones = 半音差
+    
+    # 如果音符比基准音低，我们需要反向计算
+    if remaining_semitones < 0:
+        # 反向步长: C<-B(1), B<-A(2), A<-G(2), G<-F(1), F<-E(2), E<-D(2), D<-C(2)
+        reverse_steps = [1, 2, 2, 1, 2, 2, 2] 
+        idx = 0 # 从 C 往 B 方向走
+        while remaining_semitones < 0:
+            # 取出当前方向的步长
+            step = reverse_steps[idx % 7]
+            if remaining_semitones + step <= 0:
+                remaining_semitones += step
+                line_offset -= 1
+            else:
+                break
+            idx += 1
+    else:
+        # 如果音符比基准音高，正向计算
+        idx = 0
+        while remaining_semitones > 0:
+            step = 自然音阶半音关系表[idx % 7]
+            if remaining_semitones - step >= 0:
+                remaining_semitones -= step
+                line_offset += 1
+            else:
+                break
+            idx += 1
+    return line_offset
 # --------------------------------- 绘制函数 ---------------------------------
-
-
 def draw_staff(
     draw,
     config: StaffConfig,
@@ -123,38 +168,26 @@ def draw_staff(
             else:
                 y = line3_y
             draw.rectangle([x - 6, y - 6, x + 6, y + 4], fill="#5f7f9e")
-            draw.text((x - 4, y - 2), symbol, fill="white", font=music_font)
+            draw.text((x - 4, y - 2), symbol, fill="black", font=font)
             continue
 
-        # 音符
+        # 音符 bug:  音符的Y位置不对 ai代码的问题在于 使用了midi编号计算线的索引位置，有问题
         elif el.isNote:
             midi = el.pitch.midi
-            line_index = midi - base_midi  # 0 = 线1, 6 = 线7
+            line_offset = get_line_offset_from_midi_treble(midi, base_midi)
 
             # 计算符头 Y
-            note_y = staff_y - line_index * LINE_SPACING
+            note_y = staff_y - line_offset * LINE_SPACING
 
-            # -------- 加线绘制 --------
-            def draw_ledger_lines(low_line, high_line, exclude):
-                """在 low_line 和 high_line 之间的整数线位置画短线，排除 exclude 线"""
-                if low_line > high_line:
-                    low_line, high_line = high_line, low_line
-                for l in range(low_line, high_line + 1):
-                    if l == exclude:
-                        continue
-                    ledger_y = staff_y - l * LINE_SPACING
-                    draw.line(
-                        (x - NOTE_HEAD_R - 2, ledger_y, x + NOTE_HEAD_R + 2, ledger_y),
-                        fill="black",
-                        width=1,
-                    )
-            # 基本线范围 [0, 6]
-            if line_index < 0:
-                # 下加线
-                draw_ledger_lines(line_index, -1, exclude=line_index)
-            elif line_index > 6:
-                # 上加线
-                draw_ledger_lines(7, line_index, exclude=line_index)
+            # 绘制加线
+            if line_offset < 0 or line_offset > 6:
+                draw.line(
+                    (x - NOTE_HEAD_R - 3, note_y, x + NOTE_HEAD_R + 3, note_y),
+                    fill="black",
+                    width=1,
+                )
+                
+
             # -------- 符头 --------
             draw.ellipse(
                 [
@@ -265,8 +298,8 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
 
     # 绘制低音谱（如果有）
     if bass_part:
-        # draw_staff(draw, BASS, BASS_TOP_Y, bass_notes, key_timeline,
-        #            80, canvas_width, chineseFont, music_font, measures, None)
+        #draw_staff(draw, BASS, BASS_TOP_Y, bass_notes, key_timeline,
+        #           80, canvas_width, chineseFont, music_font, measures, None)
         pass
 
     img.save(output_path)
