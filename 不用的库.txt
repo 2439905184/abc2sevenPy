@@ -1,0 +1,5 @@
+pip install pycairo
+pip install pangocairo
+pip install manimpango
+# 或者
+pip install manimpango -i https://pypi.tuna.tsinghua.edu.cn/simple

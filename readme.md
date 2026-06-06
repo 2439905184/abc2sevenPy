@@ -5,6 +5,7 @@
 ```
 pip install music21
 pip install pillow
+pip install freetype-py
 ```
 ## music21支持的转换器
 ```
