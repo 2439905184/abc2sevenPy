@@ -1,30 +1,86 @@
 import argparse
 import music21
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, features
+import freetype
 
 # --------------------------------- 辅助函数 ---------------------------------
+def render_glyph_to_image(font_path, char_code, font_size=80):
+    """
+    使用 FreeType 渲染一个字符（通过 Unicode 码点）为 PIL Image（灰度图，透明背景）。
+    返回 (image, bearing_y) 其中 bearing_y 是字形顶部的偏移（相对于基线）。
+    """
+    face = freetype.Face(font_path)
+    # 设置字符大小（单位：1/64 点，*64 是 FreeType 惯例）
+    face.set_char_size(font_size * 64)
 
+    # 加载字形，使用 FT_LOAD_RENDER 直接渲染到位图
+    # 第二个参数可以是 0 或 freetype.FT_LOAD_RENDER
+    face.load_char(char_code, freetype.FT_LOAD_RENDER)
+    glyph = face.glyph
+    bitmap = glyph.bitmap
+
+    # 获取位图数据（bytes 对象）
+    width = bitmap.width
+    height = bitmap.rows
+    # 位图每行像素数（可能有 padding）
+    pitch = bitmap.pitch
+
+    # 将 FreeType 的灰度缓冲区（每个字节一个像素）转换为 Pillow Image
+    # 注意：FreeType 的位图模式是 FT_PIXEL_MODE_GRAY，每个像素 1 字节
+    mode = 'L'  # 8 位灰度，黑色为 0，白色为 255？
+    # 实际上 FreeType 渲染的是黑色字符在透明背景上，但位图是反色？测试一下
+    # 通常 bitmap.buffer 中是 [0,0,0,...] 表示背景，字符处 >0
+    # 转换为 PIL 能用的 'L' 模式（0=黑，255=白）
+    # 直接复制 buffer
+    buffer_data = bitmap.buffer
+    if isinstance(buffer_data, list):
+        buffer_data = bytes(buffer_data)
+    img = Image.frombytes('L', (width, height), buffer_data)
+    # img = Image.frombytes('L', (width, height), bitmap.buffer)
+
+    # 可选：反转颜色（如果希望黑色字符、白色背景，则用 point 函数）
+    # img = img.point(lambda p: 255 - p)
+
+    # 获取上边距（基线到字符顶部的距离）
+    bearing_y = glyph.bitmap_top
+
+    return img, bearing_y
 
 def get_time_sorted_events(stream, event_class):
     events = stream.flat.getElementsByClass(event_class)
     return sorted(events, key=lambda e: e.offset)
 
 
+# def get_rest_shape(duration):
+#     if duration >= 3.9:
+#         return ("full", "\uE4e5")
+#     elif duration >= 1.9:
+#         return ("half", "\uE4e5")
+#     elif duration >= 0.9:
+#         return ("quarter", "\uE4e5")
+#     elif duration >= 0.45:
+#         return ("eighth", "\uE4e5")
+#     elif duration >= 0.225:
+#         return ("16th", "\uE4e5")
+#     else:
+#         return ("other", "\uE4e5")
+
 def get_rest_shape(duration):
+    # 测试用
+    glyph_img, bearing_y = render_glyph_to_image(musicFontPath, "\uE4E5", font_size=80)
     if duration >= 3.9:
-        return ("full", "休")
+        #glyph_img, bearing_y = render_glyph_to_image(musicFontPath, "\ue4e5", font_size=80)
+        return ("full", glyph_img)
     elif duration >= 1.9:
-        return ("half", "休")
+        return ("half", glyph_img)
     elif duration >= 0.9:
-        return ("quarter", "休")
+        return ("quarter", glyph_img)
     elif duration >= 0.45:
-        return ("eighth", "休")
+        return ("eighth", glyph_img)
     elif duration >= 0.225:
-        return ("16th", "休")
+        return ("16th", glyph_img)
     else:
-        return ("other", "休")
-
-
+        return ("other", glyph_img)
 # --------------------------------- 谱表配置 ---------------------------------
 class StaffConfig:
     def __init__(self, base_midi, name):
@@ -107,6 +163,7 @@ def draw_staff(
     music_font,
     当前谱表的小节,
     offset_map,
+    PILImage,
 ):
     """
     在指定 Y 位置绘制一个谱表（七条线+音符/休止符/加线/临时记号/调号标记/拍号）。
@@ -157,7 +214,7 @@ def draw_staff(
         top_y = line_y[6]# - 5
         bottom_y = line_y[0] #+ 5
         draw.line((x, top_y, x, bottom_y), fill="black", width=1)
-        print("小节线:", m.offset, x)
+        #print("小节线:", m.offset, x)
 
     # 处理音符/休止符
     for el in notes_and_rests:
@@ -165,16 +222,17 @@ def draw_staff(
         x = start_x + offset * PIXELS_PER_BEAT
 
         if el.isRest:
-            shape, symbol = get_rest_shape(el.quarterLength)
+            duration, img = get_rest_shape(el.quarterLength)
             line3_y = line_y[2]  # 第三条线
-            if shape == "full":
+            if duration == "full":
                 y = line3_y - LINE_SPACING
-            elif shape == "half":
+            elif duration == "half":
                 y = line3_y + LINE_SPACING
             else:
                 y = line3_y
+            PILImage.paste(img, (int(x), int(y)), mask=img)
             #draw.rectangle([x - 6, y - 6, x + 6, y + 4], fill="#5f7f9e")
-            draw.text((x - 4, y - 2), symbol, fill="black", font=font)
+            #draw.text((x - 4, y - 2), symbol, fill="black", font=font)
             continue
 
         # 音符 bug:  音符的Y位置不对 ai代码的问题在于 使用了midi编号计算线的索引位置，有问题
@@ -250,7 +308,7 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
     # 获取小节 这里获取不到小节信息，需要查询API，或者使用Score.measures，但是这是总表的，不是每个声部的蒋小姐
     treble_measures = treble_part.getElementsByClass(music21.stream.Measure)
     bass_measures = bass_part.getElementsByClass(music21.stream.Measure)
-    print(treble_measures)
+    #print(treble_measures)
     
     # 计算最大时间
     all_notes = treble_notes + bass_notes
@@ -260,15 +318,7 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
     img = Image.new("RGB", (canvas_width, canvas_height), "white")
     draw = ImageDraw.Draw(img)
 
-    try:
-        chineseFont = ImageFont.truetype("assets/puhuiti.otf", 16)
-        # chineseFont = ImageFont.truetype("", 36)
-        # music_font = ImageFont.truetype("assets/bravura.ttf", 20)
-        music_font = chineseFont
-    except:
-        # chineseFont = ImageFont.load_default()
-        # music_font = chineseFont
-        pass
+    
     # 标题
     title = score.metadata.title or "Untitled"
     draw.text(
@@ -302,6 +352,7 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
         music_font,
         treble_measures,
         None,
+        img
     )
 
     # 绘制低音谱（如果有）
@@ -340,4 +391,18 @@ if __name__ == "__main__":
 
     print(f"标题: {score.metadata.title}")
     print(f"声部数量: {len(score.parts)}")
+    if features.check("raqm"):
+        print("✅ 系统支持 RAQM 布局引擎，将启用高级字体特性。")
+        LAYOUT_ENGINE = ImageFont.Layout.RAQM
+    else:
+        print("⚠️ 系统不支持 RAQM。将使用基础布局。")
+        print("   (如需启用，在 Ubuntu/Debian 可执行: sudo apt-get install libraqm-dev)")
+        LAYOUT_ENGINE = None
+    chineseFont = ImageFont.truetype("assets/puhuiti.otf", 16)
+    try:
+        music_font = ImageFont.truetype("assets/bravura-bravura-1.392/redist/otf/BravuraText.otf", 20)
+    except Exception as e:
+        print("⚠️ 找不到字体文件，将使用默认字体。")
+        # music_font = ImageFont.truetype("assets/NotoSansCJK-Regular.otf", 20)
+    musicFontPath = "assets/bravura-bravura-1.392/redist/otf/BravuraText.otf"
     draw_seven_staff(score, args.output)
