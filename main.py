@@ -105,7 +105,7 @@ def draw_staff(
     canvas_width,
     font,
     music_font,
-    measures,
+    当前谱表的小节,
     offset_map,
 ):
     """
@@ -152,10 +152,10 @@ def draw_staff(
             prev_key = (tonic_name, mode)
 
     # 画小节线（每个谱表独立）
-    for m in measures:
+    for m in 当前谱表的小节:
         x = start_x + m.offset * PIXELS_PER_BEAT
-        top_y = line_y[6] - 5
-        bottom_y = line_y[0] + 5
+        top_y = line_y[6]# - 5
+        bottom_y = line_y[0] #+ 5
         draw.line((x, top_y, x, bottom_y), fill="black", width=1)
         print("小节线:", m.offset, x)
 
@@ -247,9 +247,11 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
     treble_notes = list(treble_part.flat.notesAndRests) if treble_part else []
     bass_notes = list(bass_part.flat.notesAndRests) if bass_part else []
 
-    # 获取小节
-    measures = list(score.flat.getElementsByClass(music21.stream.Measure))
-    print(measures)
+    # 获取小节 这里获取不到小节信息，需要查询API，或者使用Score.measures，但是这是总表的，不是每个声部的蒋小姐
+    treble_measures = treble_part.getElementsByClass(music21.stream.Measure)
+    bass_measures = bass_part.getElementsByClass(music21.stream.Measure)
+    print(treble_measures)
+    
     # 计算最大时间
     all_notes = treble_notes + bass_notes
     max_time = max((el.offset + el.quarterLength for el in all_notes), default=4)
@@ -298,14 +300,14 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
         canvas_width,
         chineseFont,
         music_font,
-        measures,
+        treble_measures,
         None,
     )
 
     # 绘制低音谱（如果有）
     if bass_part:
         #draw_staff(draw, BASS, BASS_TOP_Y, bass_notes, key_timeline,
-        #           80, canvas_width, chineseFont, music_font, measures, None)
+        #           80, canvas_width, chineseFont, music_font, bass_measures, None)
         pass
 
     img.save(output_path)
