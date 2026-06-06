@@ -333,7 +333,21 @@ def draw_staff(
     # 画七条线
 
     for i, y in enumerate(line_y):
-
+        if i == 0:
+            text = "do"
+        elif i == 1:
+            text = "re"
+        elif i == 2:
+            text = "mi"
+        elif i == 3:
+            text = "fa"
+        elif i == 4:
+            text = "so"
+        elif i == 5:
+            text = "la"
+        elif i == 6:
+            text = "si"
+        draw.text((40-6,y), text, fill="black")
         draw.line((40, y, canvas_width - 40, y), fill="black", width=1)
 
 
