@@ -459,7 +459,7 @@ def draw_staff(
 
                 draw.line(
 
-                    (x - NOTE_HEAD_R - 3, note_y, x + NOTE_HEAD_R + 3, note_y),
+                    (x  - 3, note_y, x + 3, note_y),
 
                     fill="black",
 
@@ -467,48 +467,33 @@ def draw_staff(
                 )
 
             # -------- 符头 --------
-
-            # draw.circle([x,note_y], NOTE_HEAD_R, fill="black")
-            
+                        
             duration, img, bearing_y = get_note_shape(el.quarterLength)
             if img.mode != 'RGBA':
                 img = img.convert('RGBA')
             
-            pasete_y = note_y - bearing_y
-            canvas.paste(img, (int(x), int(pasete_y)), img)
-            draw.text((x ,note_y),str(el.pitch),fill="black",font=font)
+            #pasete_y = note_y - bearing_y
+            canvas.paste(img, (int(x), int(note_y)), img)
+            #draw.text((x ,note_y),str(el.pitch),fill="black",font=font)
             
             # -------- 临时变音记号 --------
 
             acc = el.pitch.accidental
 
             if acc is not None and acc.alter != 0:
-
-                symbol = "♯" if acc.alter == 1 else "♭" if acc.alter == -1 else ""
-
-                if symbol:
-
-                    draw.text(
-
-                        (x + NOTE_HEAD_R + 2, note_y - NOTE_HEAD_R),
-
-                        symbol,
-                        fill="red",
-                        font=font,
-                    )
+                if acc.alter == 1: # #
+                    symbol, bearing_y = render_glyph_to_image(musicFontPath, "\uE262",font_size=36)
+                elif acc.alter == -1: # b
+                    symbol, bearing_y = render_glyph_to_image(musicFontPath, "\uE260",font_size=36)
+                canvas.paste(symbol, (int(x), int(note_y)), symbol)
 
             # 还原记号（显式 natural）
-
             elif acc is not None and acc.name == "natural":
-
-                draw.text(
-
-                    (x + NOTE_HEAD_R + 2, note_y - NOTE_HEAD_R), "♮", fill="red", font=font
-                )
-                pass
+                symbol, bearing_y = render_glyph_to_image(musicFontPath, "\uE261",font_size=36)
+                canvas.paste(symbol, (int(x), int(note_y)), symbol)
 
         elif el.isChord:
-
+            
             pass
 
 
@@ -642,9 +627,8 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
 
     if bass_part:
 
-        #draw_staff(draw, BASS, BASS_TOP_Y, bass_notes, key_timeline,
-
-        #           80, canvas_width, chineseFont, music_font, bass_measures, None)
+        draw_staff(draw, BASS, BASS_TOP_Y, bass_notes, key_timeline,
+                   80, canvas_width, chineseFont, music_font, bass_measures, None,img)
         pass
 
 
