@@ -318,9 +318,6 @@ def draw_staff(
     base_midi = config.base_midi
 
     # 七条线的 Y 坐标 (线1=最下)
-
-    # line_y = [staff_y - i * LINE_SPACING for i in range(7)]
-
     line_y = []
 
     for i in range(7):
@@ -347,7 +344,7 @@ def draw_staff(
             text = "la"
         elif i == 6:
             text = "si"
-        draw.text((40-6,y), text, fill="black")
+        draw.text((40-6, y), text, fill="black")
         draw.line((40, y, canvas_width - 40, y), fill="black", width=1)
 
 
@@ -488,7 +485,7 @@ def draw_staff(
             
             #pasete_y = note_y - bearing_y
             canvas.paste(img, (int(x), int(note_y)), img)
-            #draw.text((x ,note_y),str(el.pitch),fill="black",font=font)
+            draw.text((x ,note_y+24), str(el.pitch) ,fill="black", font=smallFont)
             
             # -------- 临时变音记号 --------
 
@@ -714,7 +711,7 @@ if __name__ == "__main__":
         LAYOUT_ENGINE = None
 
     chineseFont = ImageFont.truetype("assets/puhuiti.otf", 16)
-
+    smallFont = ImageFont.truetype("assets/puhuiti.otf", 10)
     try:
 
         music_font = ImageFont.truetype("assets/bravura-bravura-1.392/redist/otf/BravuraText.otf", 20)
