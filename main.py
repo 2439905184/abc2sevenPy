@@ -66,30 +66,19 @@ def render_glyph_to_image(font_path, char_code, font_size=80):
 
         buffer_data = bytes(buffer_data)
 
-    gray = Image.frombytes('L', (width, height), buffer_data)
-
-    alpha = gray
-
-    black_rgb = Image.new('RGB', (width, height), (0, 0, 0))
-
-    rgba = Image.merge('RGBA', (*black_rgb.split(), alpha))
-
-    img = Image.frombytes('L', (width, height), buffer_data)
-
-
-    # 可选：反转颜色（如果希望黑色字符、白色背景，则用 point 函数）
-
-    # img = img.point(lambda p: 255 - p)
-
-
-    # 获取上边距（基线到字符顶部的距离）
-
+    # 1. 创建 Alpha 通道：FreeType 的 buffer 直接就是 Alpha 掩码
+    # 0=透明, 255=不透明
+    alpha = Image.frombytes('L', (width, height), buffer_data)
+    
+    # 2. 创建颜色通道：我们要黑色的字，所以创建一个全黑的图像
+    # 模式 'L'，全部填充 0 (黑色)
+    black_layer = Image.new('L', (width, height), 0)
+    
+    # 3. 合并：将黑色层作为颜色，alpha 层作为透明度
+    # 结果：字符部分是黑色且有不透明度，背景是完全透明
+    img_rgba = Image.merge('LA', (black_layer, alpha))
     bearing_y = glyph.bitmap_top
-
-
-    return img, bearing_y
-
-
+    return img_rgba, bearing_y
 def get_time_sorted_events(stream, event_class):
 
     events = stream.flat.getElementsByClass(event_class)
@@ -171,7 +160,7 @@ PIXELS_PER_BEAT = 80 # 38 normal
 
 # 谱表垂直间距
 
-STAFF_TOP_Y = 200  # 高音谱第一条线 Y
+STAFF_TOP_Y = 300  # 高音谱第一条线 Y
 
 STAFF_GAP = 80  # 两谱表第一条线之间的距离（高音第一条线到低音第一条线）
 
@@ -416,10 +405,11 @@ def draw_staff(
                 y = line3_y
 
             pasete_y = y - bearing_y
-            canvas.paste(img, (int(x), int(pasete_y)), mask=img)
-
-            #draw.rectangle([x - 6, y - 6, x + 6, y + 4], fill="#5f7f9e")
-
+            # 【修改点】：如果 img 是 RGBA 模式，直接 paste，不需要 mask 参数
+            # 确保 img 是 RGBA 模式
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
+            canvas.paste(img, (int(x), int(pasete_y)), img)
             #draw.text((x - 4, y - 2), symbol, fill="black", font=font)
 
             continue
