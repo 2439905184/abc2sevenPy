@@ -124,10 +124,35 @@ def get_rest_shape(duration):
 
         rest_type = "other"
 
-    glyph_img, bearing_y = render_glyph_to_image(musicFontPath, char_code, font_size=80)
+    glyph_img, bearing_y = render_glyph_to_image(musicFontPath, char_code, font_size=50)
 
     return rest_type, glyph_img, bearing_y
 
+def get_note_shape(duration):
+    # 全 二 四 八 十六
+    # U+E1D2 U+E1D3 U+E1D5 U+E1D7 U+E1D9
+    # 符头
+    # U+E0A2 U+E0A3 U+E0A4 
+    if duration >= 3.9:
+        note_type = "full"
+        char_code = "\uE1D2"
+    elif duration >= 1.9:
+        note_type = "half"
+        char_code = "\uE1D3"
+    elif duration >= 0.9:
+        note_type = "quarter"
+        char_code = "\uE1D5"
+    elif duration >= 0.45:
+        note_type = "eighth"
+        char_code = "\uE1D7"
+    elif duration >= 0.225:
+        note_type = "16th"
+        char_code = "\uE1D9"
+    else:
+        note_type = "other"
+        char_code = "\uE1D5"
+    glyph_img, bearing_y = render_glyph_to_image(musicFontPath, char_code, font_size=36)
+    return note_type, glyph_img, bearing_y
 # --------------------------------- 谱表配置 ---------------------------------
 
 class StaffConfig:
@@ -443,29 +468,16 @@ def draw_staff(
 
             # -------- 符头 --------
 
-            # draw.ellipse(
-
-            #     [
-
-            #         x - NOTE_HEAD_R,
-
-            #         note_y - NOTE_HEAD_R,
-
-            #         x + NOTE_HEAD_R,
-
-            #         note_y + NOTE_HEAD_R,
-
-            #     ],
-
-            #     fill="black",
-
-            # )
-
-            draw.circle([x,note_y], NOTE_HEAD_R, fill="black")
-
-            draw.text((x-NOTE_HEAD_R,note_y),str(el.pitch),fill="black",font=font)
-
-
+            # draw.circle([x,note_y], NOTE_HEAD_R, fill="black")
+            
+            duration, img, bearing_y = get_note_shape(el.quarterLength)
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
+            
+            pasete_y = note_y - bearing_y
+            canvas.paste(img, (int(x), int(pasete_y)), img)
+            draw.text((x ,note_y),str(el.pitch),fill="black",font=font)
+            
             # -------- 临时变音记号 --------
 
             acc = el.pitch.accidental
@@ -538,14 +550,10 @@ def draw_seven_staff(score: music21.stream.Score, output_path: str):
     bass_notes = list(bass_part.flat.notesAndRests) if bass_part else []
 
 
-    # 获取小节 这里获取不到小节信息，需要查询API，或者使用Score.measures，但是这是总表的，不是每个声部的蒋小姐
+    # 获取小节 或者使用Score.measures，但是这是总表的，不是每个声部的
 
     treble_measures = treble_part.getElementsByClass(music21.stream.Measure)
-
     bass_measures = bass_part.getElementsByClass(music21.stream.Measure)
-
-    #print(treble_measures)
-    
 
     # 计算最大时间
 
