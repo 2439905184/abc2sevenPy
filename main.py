@@ -187,7 +187,7 @@ PIXELS_PER_BEAT = 80 # 38 normal
 
 STAFF_TOP_Y = 300  # 高音谱第一条线 Y
 
-STAFF_GAP = 80  # 两谱表第一条线之间的距离（高音第一条线到低音第一条线）
+STAFF_GAP = 200  # 两谱表第一条线之间的距离（高音第一条线到低音第一条线）
 
 BASS_TOP_Y = STAFF_TOP_Y + STAFF_GAP
 
