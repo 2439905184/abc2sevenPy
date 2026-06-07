@@ -305,6 +305,14 @@ def draw_staff(
                 )
 
         elif el.isChord:
+            notes = el.notes
+            for note in notes:
+                line_offset = get_line_offset_from_pitch(note.pitch.step, note.pitch.octave, base_midi)
+                note_y = staff_y - line_offset * LINE_SPACING
+                duration, img, bearing_y = get_note_shape(note.quarterLength)
+                if img.mode != 'RGBA':
+                    img = img.convert('RGBA')
+                canvas.paste(img, (int(x), int(note_y - bearing_y)), img)
             pass
 
 
