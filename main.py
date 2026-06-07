@@ -6,7 +6,6 @@ from PIL import Image, ImageDraw, ImageFont, features
 
 import freetype
 
-
 # --------------------------------- 辅助函数 ---------------------------------
 
 def render_glyph_to_image(font_path, char_code, font_size=80):
@@ -19,9 +18,10 @@ def render_glyph_to_image(font_path, char_code, font_size=80):
 
     face = freetype.Face(font_path)
 
-    # 设置字符大小（单位：1/64 点，*64 是 FreeType 惯例）
-
-    face.set_char_size(font_size * 64)
+    # 🐛 Bug 2（次要）：set_char_size 参数传递错误
+    # freetype-py 的签名是 set_char_size(width=0, height=16*64, hres=72, vres=72)。
+    # 当 font_size=36 时，实际渲染为 宽 36pt × 高 16pt，音符头被压扁变形。
+    face.set_char_size(height=font_size * 64)
 
 
     # 加载字形，使用 FT_LOAD_RENDER 直接渲染到位图
@@ -196,7 +196,14 @@ BASS_TOP_Y = STAFF_TOP_Y + STAFF_GAP
 # 返回: line_offset (整数)。0 表示基准线，1 表示高一条线，-1 表示低一条线。
 
 # 你的思路非常清晰且正确：先算半音差，再根据自然音阶的“全全半全全全半”规律，将其转换为线位索引。
+# 🐛 Bug 1（主因）：get_line_offset_from_midi_treble 对含升降号的音符计算错误
+# 你的算法用"逐步减去半音"来数线位，但遇到降号音符时会多数到前一条线上。
+"""结果：line_offset = 5（A 线），但 B♭ 应该在 B 线（line_offset = 6）！差了整整一条线。
 
+同样的错误发生在所有"降号音符"上：E♭、A♭、D♭、G♭ 等全部偏移一条线。
+
+根因：当剩余半音不足以完成下一个全音步长（如 A→B 需要 2 半音但只剩 1）时，算法直接 break，没有把这 1 个半音算作"下一个音名的降号变体"。
+"""
 def get_line_offset_from_midi_treble(midi_note, base_midi_c) -> int:
 
     # 计算 MIDI 音符相对于基准 C (base_midi_c) 的线索引偏移量。
@@ -457,7 +464,7 @@ def draw_staff(
             midi = el.pitch.midi
 
             line_offset = get_line_offset_from_midi_treble(midi, base_midi)
-
+            #print(line_offset)
 
             # 计算符头 Y
 
@@ -483,8 +490,8 @@ def draw_staff(
             if img.mode != 'RGBA':
                 img = img.convert('RGBA')
             
-            #pasete_y = note_y - bearing_y
-            canvas.paste(img, (int(x), int(note_y)), img)
+            pasete_y = note_y - bearing_y
+            canvas.paste(img, (int(x), int(pasete_y)), img)
             draw.text((x ,note_y+24), str(el.pitch) ,fill="black", font=smallFont)
             
             # -------- 临时变音记号 --------
@@ -710,18 +717,12 @@ if __name__ == "__main__":
 
         LAYOUT_ENGINE = None
 
-    chineseFont = ImageFont.truetype("assets/puhuiti.otf", 16)
-    smallFont = ImageFont.truetype("assets/puhuiti.otf", 10)
     try:
-
+        chineseFont = ImageFont.truetype("assets/puhuiti.otf", 16)
+        smallFont = ImageFont.truetype("assets/puhuiti.otf", 10)
         music_font = ImageFont.truetype("assets/bravura-bravura-1.392/redist/otf/BravuraText.otf", 20)
-
     except Exception as e:
-
         print("⚠️ 找不到字体文件，将使用默认字体。")
-
-        # music_font = ImageFont.truetype("assets/NotoSansCJK-Regular.otf", 20)
-
     musicFontPath = "assets/bravura-bravura-1.392/redist/otf/BravuraText.otf"
 
     draw_seven_staff(score, args.output)
